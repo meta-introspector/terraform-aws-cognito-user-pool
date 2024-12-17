@@ -1,3 +1,15 @@
+variable aws_account {}
+variable myemail {}
+variable mydomain {}
+variable mydomain_suffix {}
+locals {
+  mydomain=var.mydomain
+  mydomain_suffix = var.mydomain_suffix
+  mydomain_dot_com = "${local.mydomain}.${local.mydomain_suffix}"
+  myemail=var.myemail
+  myaccount=var.aws_account
+}
+
 module "aws_cognito_user_pool_complete_example" {
 
   source = "lgallard/cognito-user-pool/aws"
@@ -28,8 +40,8 @@ module "aws_cognito_user_pool_complete_example" {
 
   email_configuration = {
     email_sending_account  = "DEVELOPER"
-    reply_to_email_address = "email@mydomain.com"
-    source_arn             = "arn:aws:ses:us-east-1:123456789012:identity/myemail@mydomain.com"
+    reply_to_email_address = "email@${local.mydomain_dot_com}"
+    source_arn             = "arn:aws:ses:us-east-1:123456789012:identity/${local.myemail}@${local.mydomain_dot_com}"
   }
 
   lambda_config = {
@@ -148,7 +160,7 @@ module "aws_cognito_user_pool_complete_example" {
   ]
 
   # user_pool_domain
-  domain = "mydomain-com"
+  domain = "${local.mydomain}-com"
 
   # clients
   clients = [
@@ -156,8 +168,8 @@ module "aws_cognito_user_pool_complete_example" {
       allowed_oauth_flows                  = []
       allowed_oauth_flows_user_pool_client = false
       allowed_oauth_scopes                 = []
-      callback_urls                        = ["https://mydomain.com/callback"]
-      default_redirect_uri                 = "https://mydomain.com/callback"
+      callback_urls                        = ["https://${local.mydomain_dot_com}/callback"]
+      default_redirect_uri                 = "https://${local.mydomain_dot_com}/callback"
       explicit_auth_flows                  = []
       generate_secret                      = true
       logout_urls                          = []
@@ -180,8 +192,8 @@ module "aws_cognito_user_pool_complete_example" {
       allowed_oauth_flows                  = []
       allowed_oauth_flows_user_pool_client = false
       allowed_oauth_scopes                 = []
-      callback_urls                        = ["https://mydomain.com/callback"]
-      default_redirect_uri                 = "https://mydomain.com/callback"
+      callback_urls                        = ["https://${local.mydomain_dot_com}/callback"]
+      default_redirect_uri                 = "https://${local.mydomain_dot_com}/callback"
       explicit_auth_flows                  = []
       generate_secret                      = false
       logout_urls                          = []
@@ -195,11 +207,11 @@ module "aws_cognito_user_pool_complete_example" {
       allowed_oauth_flows                  = ["code", "implicit"]
       allowed_oauth_flows_user_pool_client = true
       allowed_oauth_scopes                 = ["email", "openid"]
-      callback_urls                        = ["https://mydomain.com/callback"]
-      default_redirect_uri                 = "https://mydomain.com/callback"
+      callback_urls                        = ["https://${local.mydomain_dot_com}/callback"]
+      default_redirect_uri                 = "https://${local.mydomain_dot_com}/callback"
       explicit_auth_flows                  = ["CUSTOM_AUTH_FLOW_ONLY", "ADMIN_NO_SRP_AUTH"]
       generate_secret                      = false
-      logout_urls                          = ["https://mydomain.com/logout"]
+      logout_urls                          = ["https://${local.mydomain_dot_com}/logout"]
       name                                 = "test3"
       read_attributes                      = ["email", "phone_number"]
       supported_identity_providers         = []
@@ -221,16 +233,16 @@ module "aws_cognito_user_pool_complete_example" {
   # resource_servers
   resource_servers = [
     {
-      identifier = "https://mydomain.com"
-      name       = "mydomain"
+      identifier = "https://${local.mydomain_dot_com}"
+      name       = "${local.mydomain}"
       scope = [
         {
           scope_name        = "sample-scope-1"
-          scope_description = "A sample Scope Description for mydomain.com"
+          scope_description = "A sample Scope Description for ${local.mydomain_dot_com}"
         },
         {
           scope_name        = "sample-scope-2"
-          scope_description = "Another sample Scope Description for mydomain.com"
+          scope_description = "Another sample Scope Description for ${local.mydomain_dot_com}"
         },
       ]
     },
